@@ -1,1 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escape Road Choice Menu</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0d0d13;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    h1 {
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 0 10px #ff0055, 0 0 20px #ff0055;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      max-width: 900px;
+      width: 90%;
+    }
+    .card {
+      background: #1a1a24;
+      border: 2px solid #2a2a3a;
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-8px) scale(1.03);
+      border-color: #ff0055;
+      box-shadow: 0 12px 30px rgba(255, 0, 85, 0.5);
+    }
+    .card.selected {
+      animation: click-pop 0.45s ease forwards;
+      background: #ff0055;
+      border-color: #ffffff;
+      box-shadow: 0 0 25px #ff0055;
+    }
+    @keyframes click-pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+      100% { transform: scale(1.04); }
+    }
+    .card h2 { margin: 0 0 0.5rem; font-size: 1.5rem; }
+    .card p { margin: 0; font-size: 0.9rem; color: #aaa; }
+  </style>
+</head>
+<body>
+
+  <h1>Choose Your Escape</h1>
+  <div class="grid">
+    <div class="card" onclick="selectOption(this, 'parachute')">
+      <h2>🪂 PARACHUTE</h2>
+      <p>Leap off the high bridge into the canyon wind stream!</p>
+    </div>
+    <div class="card" onclick="selectOption(this, 'swim')">
+      <h2>🏊 SWIM</h2>
+      <p>Dive deep into the harbor to evade choppers!</p>
+    </div>
+    <div class="card" onclick="selectOption(this, 'hijack')">
+      <h2>🚁 HIJACK</h2>
+      <p>Commandeer the police helicopter.</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      projectId: "quizlane-c0850",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.selectOption = async (element, optionId) => {
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+      element.classList.add('selected');
+      try {
+        const playerRef = doc(db, "players", "current_user_id");
+        await updateDoc(playerRef, {
+          selectedEscapeOption: optionId,
+          timestamp: new Date()
+        });
+      } catch (err) {
+        console.warn("UI animation updated!", err);
+      }
+    };
+  </script>
+</body>
+</html>
 
